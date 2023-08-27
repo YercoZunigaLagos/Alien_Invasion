@@ -3,6 +3,7 @@ import pygame
 import random
 from settings import Settings
 from ship import Ship
+from bullet import Bullet
 
 
 class AlienInvasion:
@@ -21,15 +22,22 @@ class AlienInvasion:
         
 
         self.ship = Ship(self)
-
+        self.bullets = pygame.sprite.Group()
 
     def run_game(self):
         """Start the main loop for the game."""
         while True:
         # Watch for keyboard and mouse events.
             self._check_events()
+            self.ship.update()
+            self.bullets.update()
+
             self._update_screen()
-     
+            #Eliminar balas que desaparecen
+            for bullet in self.bullets.copy():
+                if bullet.rect.bottom <=0:
+                    self.bullets.remove(bullet)
+            #print(len(self.bullets))
     def _check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -49,15 +57,26 @@ class AlienInvasion:
                 self.ship.moving_right = True
             elif event.key == pygame.K_LEFT:
                 self.ship.moving_left = True
+            elif event.key == pygame.K_SPACE:
+                self._fire_bullet()
             elif event.key == pygame.K_q:
                 sys.exit()
+    
+    def _fire_bullet(self):
+        if len(self.bullets) < self.settings.bullets_allowed:
+
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
     def _update_screen(self):
     #Redibujar la pantalla por cada pasada
 
         self.screen.fill(self.settings.bg_color)
 
         self.ship.blitme()
-        self.ship.update()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
         # Make the most recently drawn screen visible.
         pygame.display.flip()
         self.clock.tick(60)
