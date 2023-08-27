@@ -4,30 +4,35 @@ import random
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 
 class AlienInvasion:
-    """Overall class to manage game assets and behavior."""
+    """Clase Principal para manejar el juego"""
     def __init__(self):
-        """Initialize the game, and create game resources."""
+        """Inicializar el juego con sus configuraciones """
         pygame.init()
-        #hagamos un cambio del color del background
         self.settings = Settings()
         #HACER EL JUEGO FULL PANTALLA
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.settings.screen_height = self.screen.get_rect().height
         self.settings.screen_width = self.screen.get_rect().width
         pygame.display.set_caption("Alien Invasion")
         self.clock = pygame.time.Clock()
         
-
+        #Llamamos a las demas clases
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+
+        #Creamos las naves aliens
+        self._create_fleet()
+
 
     def run_game(self):
-        """Start the main loop for the game."""
+        """Iniciamos el hilo principal del juego"""
         while True:
-        # Watch for keyboard and mouse events.
+        #refactorizamos y separamos las funcionalidades del programa en funciones separadas
             self._check_events()
             self.ship.update()
             self.bullets.update()
@@ -37,8 +42,9 @@ class AlienInvasion:
             for bullet in self.bullets.copy():
                 if bullet.rect.bottom <=0:
                     self.bullets.remove(bullet)
-            #print(len(self.bullets))
+            
     def _check_events(self):
+        """Revisamos si alguna interaccion sucede con el teclado"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                     sys.exit()
@@ -68,14 +74,42 @@ class AlienInvasion:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
 
+    def _create_fleet(self):
+        #agregar una nave
+        alien = Alien(self)
+        
+        #tomar los tamaños de la naves (imagen) y estimar el espacio libre disponible
+        alien_width = alien.rect.width
+        available_space_x = self.settings.screen_width - (2 * alien_width)
+        number_alien_x = available_space_x // (2 * alien_width)
+        #realizamos un ciclo el cual nos permita dibujar todas las naves
+        
+        for alien_number in range(number_alien_x):
+            #creamos el alien y lo colocamos en la fila
+            self._create_alien(alien_number)
+
+            
+
+
+    def _create_alien(self,alien_number):
+        alien = Alien(self)
+        alien_width = alien.rect.width
+
+        alien.x = alien_width + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+
+        self.aliens.add(alien)
+
+
     def _update_screen(self):
-    #Redibujar la pantalla por cada pasada
+        #Redibujar la pantalla por cada pasada
 
         self.screen.fill(self.settings.bg_color)
 
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
