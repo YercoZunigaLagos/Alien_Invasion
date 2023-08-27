@@ -8,7 +8,7 @@ class Ship:
         self.settings = ai_game.settings
         self.screen_rect = ai_game.screen.get_rect()
         #cargar la imagen i colocarla recta
-        self.image = pygame.transform.scale(pygame.image.load('images\ship_izquierda.png'), (35, 35))
+        self.image = pygame.transform.scale(pygame.image.load('images\ship_izquierda.png'), (50, 50))
         
 
         self.rect = self.image.get_rect()
