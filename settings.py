@@ -5,6 +5,7 @@ class Settings:
         #screen settings
         self.screen_width = 1200
         self.screen_height = 800
+        self.display_size = (self.screen_width,self.screen_height)
         self.bg_color = (0,0,0)
         self.num_stars = 100
         # Colores

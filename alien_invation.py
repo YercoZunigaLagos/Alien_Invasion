@@ -5,6 +5,7 @@ from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from background import BG
 
 
 class AlienInvasion:
@@ -21,6 +22,9 @@ class AlienInvasion:
         self.clock = pygame.time.Clock()
         
         #Llamamos a las demas clases
+        self.bg = BG()
+        self.bg_group = pygame.sprite.Group()
+        self.bg_group.add(self.bg)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
@@ -109,9 +113,11 @@ class AlienInvasion:
 
     def _update_screen(self):
         #Redibujar la pantalla por cada pasada
-
+        
+        
+        self.bg_group.update()
         self.screen.fill(self.settings.bg_color)
-
+        self.bg_group.draw(self.screen)
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
