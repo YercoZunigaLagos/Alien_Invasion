@@ -39,14 +39,13 @@ class AlienInvasion:
         #refactorizamos y separamos las funcionalidades del programa en funciones separadas
             self._check_events()
             self.ship.update()
-            self.bullets.update()
             self._update_aliens()
             self._update_screen()
-            #Eliminar balas que desaparecen
-            for bullet in self.bullets.copy():
-                if bullet.rect.bottom <=0:
-                    self.bullets.remove(bullet)
+            self._update_bullets()
             
+
+
+
     def _check_events(self):
         """Revisamos si alguna interaccion sucede con el teclado"""
         for event in pygame.event.get():
@@ -77,7 +76,19 @@ class AlienInvasion:
 
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+            
+    def _update_bullets(self):
+        """Update position of bullets and get rid of old bullets."""
+        # Update bullet positions.
+        self.bullets.update()
+        # Get rid of bullets that have disappeared.
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
 
+        self._check_bullet_alien_collisions()
+
+        
     def _create_fleet(self):
         #agregar una nave
         alien = Alien(self)
@@ -132,7 +143,16 @@ class AlienInvasion:
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
             
+    def _check_bullet_alien_collisions(self):
+        """Respond to bullet-alien collisions."""
+        # Remove any bullets and aliens that have collided.
 
+        collisions = pygame.sprite.groupcollide(
+        self.bullets, self.aliens, True, True)
+        if not self.aliens:
+            # Destroy existing bullets and create new fleet.
+            self.bullets.empty()
+            self._create_fleet()
 
     def _update_screen(self):
         #Redibujar la pantalla por cada pasada
