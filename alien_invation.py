@@ -78,12 +78,14 @@ class AlienInvasion:
             self.stats.reset_stats()
             self.stats.game_active = True   
             self.sb.prep_score()
+            self.sb.prep_level()
             # Get rid of any remaining aliens and bullets.
             self.aliens.empty()
             self.bullets.empty()
             # Create a new fleet and center the ship.
             self._create_fleet()
             self.ship.center_ship()
+            
 
     def _check_keyup_events(self,event):
         if event.type == pygame.KEYUP:
@@ -224,6 +226,9 @@ class AlienInvasion:
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+            # Increase level.
+            self.stats.level += 1
+            self.sb.prep_level()
 
     def _update_screen(self):
         #Redibujar la pantalla por cada pasada
